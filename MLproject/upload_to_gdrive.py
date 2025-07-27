@@ -14,16 +14,10 @@ credentials = Credentials.from_service_account_info(
 # 2. Build Drive API
 service = build('drive', 'v3', credentials=credentials)
 
-# 3. Gunakan ID Shared Drive (atau folder di Shared Drive) sebagai "parent"
-SHARED_DRIVE_ID = os.environ["GDRIVE_FOLDER_ID"]
-# Pastikan service account sudah diundang ke Shared Drive sebagai Content Manager / Manager / Editor
+# 3. Gunakan ID folder di My Drive sebagai parent
+PARENT_FOLDER_ID = os.environ["GDRIVE_FOLDER_ID"]
 
 def upload_directory(local_dir_path, parent_drive_id):
-    """
-    Rekursif:
-     - Jika item folder, buat folder di Drive, lalu panggil upload_directory lagi.
-     - Jika item file, langsung upload ke parent_drive_id.
-    """
     for item_name in os.listdir(local_dir_path):
         item_path = os.path.join(local_dir_path, item_name)
         if os.path.isdir(item_path):
@@ -34,13 +28,10 @@ def upload_directory(local_dir_path, parent_drive_id):
             }
             created_folder = service.files().create(
                 body=folder_meta,
-                fields='id',
-                supportsAllDrives=True
+                fields='id'
             ).execute()
             new_folder_id = created_folder["id"]
             print(f"Created folder: {item_name} (ID: {new_folder_id})")
-
-            # Rekursif ke subfolder
             upload_directory(item_path, new_folder_id)
         else:
             print(f"Uploading file: {item_name}")
@@ -52,34 +43,26 @@ def upload_directory(local_dir_path, parent_drive_id):
             service.files().create(
                 body=file_meta,
                 media_body=media,
-                fields='id',
-                supportsAllDrives=True
+                fields='id'
             ).execute()
 
-
-# 4. Baca semua subfolder (run_id) di "./mlruns/0"
-#    Kemudian buat folder sesuai run_id di Shared Drive (tanpa folder "mlruns" agar tidad redundant).
+# 4. Upload semua isi mlruns/0 ke dalam folder GDrive
 local_mlruns_0 = "./mlruns/0"
 
 for run_id in os.listdir(local_mlruns_0):
     run_id_local_path = os.path.join(local_mlruns_0, run_id)
-    # Pastikan hanya folder (bukan file)
     if os.path.isdir(run_id_local_path):
-        # Buat folder dengan nama run_id di root Shared Drive (SHARED_DRIVE_ID)
         run_id_folder_meta = {
             'name': run_id,
             'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [SHARED_DRIVE_ID]
+            'parents': [PARENT_FOLDER_ID]
         }
         run_id_folder = service.files().create(
             body=run_id_folder_meta,
-            fields='id',
-            supportsAllDrives=True
+            fields='id'
         ).execute()
         run_id_folder_id = run_id_folder["id"]
         print(f"=== Created run_id folder: {run_id} (ID: {run_id_folder_id}) ===")
-
-        # Upload isinya (subfolder, file) secara rekursif
         upload_directory(run_id_local_path, run_id_folder_id)
 
-print("=== All run_id folders and files have been uploaded directly to Shared Drive! ===")
+print("=== All run_id folders and files have been uploaded to My Drive! ===")
