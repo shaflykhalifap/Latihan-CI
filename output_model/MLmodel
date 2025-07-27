@@ -1,0 +1,38 @@
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.1
+is_signature_from_type_hint: false
+mlflow_version: 3.1.1
+model_id: null
+model_size_bytes: 624752151
+model_uuid: c5843fbe3c22469cba61624d730569f1
+prompts: null
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "Age", "required": true}, {"type": "long",
+    "name": "Credit_Mix", "required": true}, {"type": "long", "name": "Payment_of_Min_Amount",
+    "required": true}, {"type": "long", "name": "Payment_Behaviour", "required": true},
+    {"type": "double", "name": "pc1_1", "required": true}, {"type": "double", "name":
+    "pc1_2", "required": true}, {"type": "double", "name": "pc1_3", "required": true},
+    {"type": "double", "name": "pc1_4", "required": true}, {"type": "double", "name":
+    "pc1_5", "required": true}, {"type": "double", "name": "pc2_1", "required": true},
+    {"type": "double", "name": "pc2_2", "required": true}]'
+  outputs: '[{"type": "long", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-07-27 06:42:58.693783'
